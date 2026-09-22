@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boticentro Perú S.R.L. — Análisis de Situación Financiera Actual</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --verde-900:#1B5E20;
+    --verde-800:#2E7D32;
+    --verde-400:#66BB6A;
+    --verde-200:#A5D6A7;
+    --verde-050:#F1F8F1;
+    --gris-050:#FAFAFA;
+    --gris-100:#F5F5F5;
+    --gris-200:#E0E0E0;
+    --gris-300:#D0D0D0;
+    --gris-400:#BDBDBD;
+    --gris-600:#757575;
+    --gris-900:#2B2B2B;
+    --amarillo:#F9C412;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    color:var(--gris-900);
+    background:#EAEAEA;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- Página / marco de slide (apariencia PDF) ---------- */
+  .page{padding:46px 0 70px}
+  .slide{
+    width:1180px;max-width:95vw;
+    margin:0 auto 34px;
+    background:#fff;
+    border:1px solid var(--gris-300);
+    box-shadow:0 6px 24px rgba(0,0,0,.10);
+    padding:34px 46px 30px;
+    position:relative;
+    min-height:663px;
+    display:flex;flex-direction:column;
+  }
+  .slide-num{
+    position:absolute;bottom:14px;right:20px;
+    font-size:10px;color:var(--gris-400);font-weight:600;letter-spacing:.3px;
+  }
+
+  /* ---------- Header repetido (slides 2-9) ---------- */
+  .slide-topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+  .slide-id{display:flex;align-items:center;gap:12px}
+  .slide-id img.mini-logo{height:30px;width:auto;display:block}
+  .slide-id .badge{
+    width:30px;height:30px;background:var(--verde-900);color:#fff;
+    font-weight:800;font-size:14px;border-radius:4px;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .slide-id .seclabel{font-weight:800;font-size:12px;letter-spacing:1.2px;color:var(--verde-900);text-transform:uppercase}
+  .slide-eyebrow-mini{text-align:right;font-size:10px;color:var(--gris-600);font-weight:700;letter-spacing:.5px;line-height:1.5;white-space:nowrap}
+  .slide-eyebrow-mini b{color:var(--verde-900);display:block}
+
+  .slide-rule{height:1px;background:var(--gris-200);margin:14px 0 18px}
+
+  .slide-headline{font-size:22px;font-weight:800;color:var(--gris-900);line-height:1.28;max-width:980px}
+  .slide-subtitle{font-size:12.5px;color:var(--gris-600);font-style:italic;margin-top:6px}
+  .slide-divider{height:1px;background:var(--gris-200);margin:14px 0 18px}
+
+  .slide-body{flex:1;display:flex;flex-direction:column;gap:14px;min-height:0}
+
+  /* ---------- Paneles ---------- */
+  .panels{display:grid;gap:18px;flex:1;min-height:0}
+  .panels.cols-2{grid-template-columns:1.3fr 1fr}
+  .panels.cols-2-eq{grid-template-columns:1fr 1fr}
+  .panels.cols-1{grid-template-columns:1fr}
+  .panel{
+    border:1px solid var(--gris-200);border-radius:10px;
+    padding:14px 18px 16px;background:#fff;
+    display:flex;flex-direction:column;min-height:0;
+  }
+  .panel h4{
+    font-size:11.5px;font-weight:800;color:var(--verde-900);
+    text-transform:uppercase;letter-spacing:.5px;
+    border-bottom:2px solid var(--verde-200);padding-bottom:7px;margin-bottom:12px;
+  }
+  .panel-chart{position:relative;flex:1;min-height:170px}
+
+  /* ---------- Callout amarillo ---------- */
+  .callout{
+    background:#FFFBEA;border:1px solid var(--amarillo);border-radius:8px;
+    padding:11px 18px;font-size:13px;color:#5a4700;
+  }
+  .callout strong{color:#4a3900}
+
+  .source-note{font-size:9.5px;color:var(--gris-400);text-align:right;margin-top:6px}
+
+  /* ---------- Tablas compactas ---------- */
+  table.mini{width:100%;border-collapse:collapse;font-size:12px}
+  table.mini th{
+    text-align:left;background:var(--verde-900);color:#fff;
+    font-size:10px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;
+    padding:6px 8px;
+  }
+  table.mini td{padding:6px 8px;border-bottom:1px solid var(--gris-200)}
+  table.mini tr:nth-child(even) td{background:var(--gris-050)}
+  table.mini td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  table.mini tfoot td{font-weight:800;background:var(--verde-200);color:var(--verde-900)}
+
+  .tag{display:inline-block;font-weight:700;font-size:9.5px;letter-spacing:.3px;padding:2px 8px;border-radius:9px;white-space:nowrap}
+  .tag-ok{background:var(--verde-200);color:var(--verde-900)}
+  .tag-pend{background:var(--gris-200);color:var(--gris-600);border:1px dashed var(--gris-400)}
+  .tag-warn{background:#FFFBEA;color:#8a6d00;border:1px dashed var(--amarillo)}
+
+  /* ---------- KPI / tarjetas ---------- */
+  .kgrid{display:grid;gap:12px;flex:1}
+  .kgrid.g3{grid-template-columns:repeat(3,1fr)}
+  .kgrid.g2{grid-template-columns:repeat(2,1fr)}
+  .kcard{
+    border:1px solid var(--gris-200);border-radius:10px;padding:12px 14px;
+    background:#fff;display:flex;flex-direction:column;gap:4px;
+  }
+  .kcard.alerta{border-color:var(--amarillo);border-width:1.5px}
+  .kcard .klabel{font-size:10px;font-weight:700;color:var(--gris-600);text-transform:uppercase;letter-spacing:.4px}
+  .kcard .kval{font-size:18px;font-weight:800;color:var(--verde-900)}
+  .kcard .kval.small{font-size:15px}
+  .kcard .ksub{font-size:11px;color:var(--gris-600)}
+
+  /* ---------- Timeline ---------- */
+  .timeline{position:relative;padding-left:30px;flex:1;overflow:auto}
+  .timeline::before{content:'';position:absolute;left:9px;top:4px;bottom:4px;width:2px;background:var(--gris-200)}
+  .tl-step{position:relative;margin-bottom:13px}
+  .tl-step::before{content:'';position:absolute;left:-30px;top:2px;width:12px;height:12px;border-radius:50%;background:var(--verde-800);border:2px solid #fff;box-shadow:0 0 0 2px var(--gris-200)}
+  .tl-step.alerta::before{background:var(--amarillo)}
+  .tl-step .tl-date{font-size:10.5px;font-weight:800;color:var(--verde-900);text-transform:uppercase;letter-spacing:.3px}
+  .tl-step p{font-size:12px;color:var(--gris-900);margin-top:2px}
+
+  /* ---------- Cross-match (slide 5) ---------- */
+  .cross-match{display:flex;flex-direction:column;gap:8px;flex:1;justify-content:center}
+  .cm-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;font-size:11.5px}
+  .cm-src{background:var(--verde-050);border:1px solid var(--verde-200);border-radius:7px;padding:6px 9px;color:var(--verde-900);font-weight:600}
+  .cm-dst{background:var(--gris-050);border:1px solid var(--gris-200);border-radius:7px;padding:6px 9px;color:var(--gris-900);font-weight:600}
+  .cm-arrow{color:var(--verde-800);font-size:15px;font-weight:800}
+
+  /* ---------- Account cards (slide 7) ---------- */
+  .acc-total{font-size:26px;font-weight:800;color:var(--verde-900);margin:2px 0 10px}
+  .acc-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px dashed var(--gris-200)}
+  .acc-row:last-child{border-bottom:none}
+  .acc-row .lbl{color:var(--gris-600)}
+  .acc-row .val{font-weight:700;color:var(--gris-900);font-variant-numeric:tabular-nums}
+
+  /* ---------- Índice (slide 2) ---------- */
+  .toc{display:flex;flex-direction:column;gap:10px;flex:1;justify-content:center;max-width:620px}
+  .toc a{
+    display:flex;align-items:center;gap:16px;text-decoration:none;color:inherit;
+    padding:12px 16px;border:1px solid var(--gris-200);border-radius:8px;transition:.15s;
+  }
+  .toc a:hover{background:var(--verde-050);border-color:var(--verde-400)}
+  .toc .toc-badge{
+    width:30px;height:30px;background:var(--verde-900);color:#fff;font-weight:800;font-size:13px;
+    border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .toc .toc-label{font-size:14.5px;font-weight:600;color:var(--gris-900)}
+
+  /* ---------- Cierre / 3 columnas (slide 9) ---------- */
+  .review-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;flex:1}
+  .review-card{border:1px solid var(--gris-200);border-radius:10px;padding:16px 18px;border-top:4px solid var(--verde-800)}
+  .review-card.exo{border-top-color:var(--amarillo)}
+  .review-card.org{border-top-color:var(--verde-400)}
+  .review-card.endo{border-top-color:var(--gris-600)}
+  .review-card h5{font-size:13px;font-weight:800;color:var(--verde-900);margin-bottom:10px;text-transform:uppercase;letter-spacing:.3px}
+  .review-card ul{margin-left:16px;font-size:12.5px;color:var(--gris-900)}
+  .review-card ul li{margin-bottom:6px}
+
+  /* ---------- Portada ---------- */
+  .cover{
+    background:linear-gradient(135deg,#f2f9f2 0%,#ffffff 55%,#f7f7f7 100%);
+    justify-content:center;
+  }
+  .cover-top{display:flex;justify-content:space-between;align-items:flex-start}
+  .cover-eyebrow{text-align:right;font-size:12px;color:var(--gris-600);font-weight:700;letter-spacing:.6px;line-height:1.6}
+  .cover-eyebrow b{display:block;color:var(--verde-900)}
+  .cover-rule{height:1px;background:var(--gris-300);margin:22px 0 60px}
+  .cover-body{display:flex;justify-content:space-between;align-items:flex-end;gap:40px}
+  .cover-title{font-size:42px;font-weight:800;color:var(--gris-900);line-height:1.15;max-width:640px}
+  .cover-line{font-weight:700;font-size:17px;color:var(--verde-800);margin-top:14px}
+  .cover-credits-rule{width:340px;height:1px;background:var(--gris-300);margin:26px 0 14px}
+  .cover-credits{font-size:14px;color:var(--gris-600)}
+  .cover-credits b{color:var(--gris-900)}
+  .cover-logo img{width:230px;height:auto}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ===================== SLIDE 1 · PORTADA ===================== -->
+<section class="slide cover">
+  <div class="cover-top">
+    <div class="cover-logo"><img src="boticentro-logo.png" alt="Boticentro Perú S.R.L."></div>
+    <div class="cover-eyebrow">
+      <b>ANÁLISIS DE SITUACIÓN<br>FINANCIERA ACTUAL</b>
+      BOTICENTRO PERÚ S.R.L.
+    </div>
+  </div>
+  <div class="cover-rule"></div>
+  <div class="cover-body">
+    <div>
+      <div class="cover-title">Boticentro Perú S.R.L.</div>
+      <div class="cover-line">Análisis de Deuda, CxC, Liquidez</div>
+      <div class="cover-credits-rule"></div>
+      <div class="cover-credits"><b>Elaborado por Santiago Tello</b></div>
+      <div class="cover-credits">19 Setiembre 2026</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SLIDE 2 · ÍNDICE ===================== -->
+<section class="slide" id="slide-indice">
+  <div class="slide-topbar">
+    <div class="slide-id">
+      <img class="mini-logo" src="boticentro-logo.png" alt="Boticentro">
+    </div>
+    <div class="slide-eyebrow-mini"><b>ANÁLISIS DE SITUACIÓN FINANCIERA ACTUAL</b>BOTICENTRO PERÚ S.R.L.</div>
+  </div>
+  <div class="slide-rule"></div>
+  <div class="slide-headline">Índice</div>
+  <div class="slide-divider"></div>
+  <div class="slide-body">
+    <div class="toc">
+      <a href="#slide-1"><span class="toc-badge">I</span><span class="toc-label">Situación antes</span></a>
+      <a href="#slide-3"><span class="toc-badge">II</span><span class="toc-label">Acciones tomadas y deudas saldadas</span></a>
+      <a href="#slide-hoy"><span class="toc-badge">III</span><span class="toc-label">Situación a la fecha (19/09)</span></a>
+      <a href="#slide-comparativo"><span class="toc-badge">IV</span><span class="toc-label">Cómo estamos hoy vs antes?</span></a>
+      <a href="#slide-5"><span class="toc-badge">V</span><span class="toc-label">Liquidez Hoy</span></a>
+      <a href="#slide-6"><span class="toc-badge">VI</span><span class="toc-label">Oportunidades</span></a>
+      <a href="#slide-7"><span class="toc-badge">VII</span><span class="toc-label">Puntos en revisión</span></a>
+    </div>
+  </div>
+  <div class="slide-num">2 / 10</div>
+</section>
+
+<!-- ===================== SLIDE 3 (I) · DEUDAS EN REVISIÓN ===================== -->
+<section class="slide" id="slide-1">
+  <div class="slide-topbar">
+    <div class="slide-id">
+      <span class="badge">I</span>
+      <span class="seclabel">Situación antes</span>
+    </div>
+    <div class="slide-eyebrow-mini"><b>ANÁLISIS DE SITUACIÓN FINANCIERA ACTUAL</b>BOTICENTRO PERÚ S.R.L.</div>
+  </div>
+  <div class="slide-rule"></div>
+  <div class="slide-headline">Boticentro enfrentaba S/ 1 726 873 en 5 pagarés BCP por vencer entre el 21 de agosto y el 22 de setiembre</div>
+  <div class="slide-subtitle">Pagarés de corto plazo (capital + interés) | Situación al 18 de agosto de 2026</div>
+  <div class="slide-divider"></div>
+  <div class="slide-body">
+    <div class="panels cols-2">
+      <div class="panel">
+        <h4>Pagarés BCP por vencimiento (S/)</h4>
+        <div class="panel-chart"><canvas id="chartPagares"></canvas></div>
+      </div>
+      <div class="panel">
+        <h4>Otros créditos en cuotas (largo plazo)</h4>
+        <table class="mini">
+          <thead><tr><th>Obligación</th><th style="text-align:right">Saldo (S/)</th></tr></thead>
+          <tbody>
+            <tr><td>BBVA1</td><td class="num">178 401,00</td></tr>
+            <tr><td>Fraccionamiento SUNAT</td><td class="num">103 326,00</td></tr>
+            <tr><td>Leasing máquina</td><td class="num">375 584,00</td></tr>
+            <tr><td>Leasing construcción</td><td class="num">237 811,00</td></tr>
+            <tr><td>Otras deudas</td><td class="num">372 402,00</td></tr>
+          </tbody>
+          <tfoot><tr><td>Subtotal</td><td class="num">1 267 524,00</td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+    <div class="callout">Saldo total de deudas (sin letras): <strong>S/ 2 994 397</strong>.</div>
+  </div>
+  <div class="source-note">Fuente: registros internos de tesorería, Boticentro Perú S.R.L.</div>
+  <div class="slide-num">3 / 10</div>
+</section>
+
+<!-- ===================== SLIDE 4 (II) · CxC Y POR FACTURAR ===================== -->
+<section class="slide" id="slide-2">
+  <div class="slide-topbar">
+    <div class="slide-id">
+      <span class="badge">I</span>
+      <span class="seclabel">Situación antes</span>
+    </div>
+    <div class="slide-eyebrow-mini"><b>ANÁLISIS DE SITUACIÓN FINANCIERA ACTUAL</b>BOTICENTRO PERÚ S.R.L.</div>
+  </div>
+  <div class="slide-rule"></div>
+  <div class="slide-headline">Boticentro tenía S/ 898 285 en cuentas por cobrar y S/ 1 049 928 por facturar, todo aún pendiente de cobro</div>
+  <div class="slide-subtitle">Cuentas por cobrar y por facturar, aún sin gestionar | Situación al 18 de agosto de 2026</div>
+  <div class="slide-divider"></div>
+  <div class="slide-body">
+    <div class="panels cols-2-eq">
+      <div class="panel">
+        <h4>Cuentas por cobrar</h4>
+        <div class="panel-chart"><canvas id="chartCxC"></canvas></div>
+      </div>
+      <div class="panel">
+        <h4>Cuentas por facturar (aún no son CxC)</h4>
+        <div class="kgrid g2" style="grid-template-columns:1fr">
+          <div class="kcard">
+            <div class="klabel">Trujillo 2 <span class="tag tag-pend">PENDIENTE DE FACTURAR</span></div>
+            <div class="kval">S/ 839 928</div>
+            <div class="ksub">El Estado retiene IGV</div>
+          </div>
+          <div class="kcard">
+            <div class="klabel">Prosegur <span class="tag tag-pend">PENDIENTE DE FACTURAR</span></div>
+            <div class="kval">S/ 210 000</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout">Quedan <strong>S/ 1 049 928</strong> en cuentas por facturar (Trujillo 2 + Prosegur) — ingresos esperados que aún no se han emitido.</div>
+  </div>
+  <div class="source-note">Fuente: registros internos de tesorería, Boticentro Perú S.R.L.</div>
+  <div class="slide-num">4 / 10</div>
+</section>
+
+<!-- ===================== SLIDE 5 (III) · CRUCE CxC Y PAGARÉS ===================== -->
+<section class="slide" id="slide-3">
+  <div class="slide-topbar">
+    <div class="slide-id">
+      <span class="badge">II</span>
+      <span class="seclabel">Acciones tomadas y deudas saldadas</span>
+    </div>
+    <div class="slide-eyebrow-mini"><b>ANÁLISIS DE SITUACIÓN FINANCIERA ACTUAL</b>BOTICENTRO PERÚ S.R.L.</div>
+  </div>
+  <div class="slide-rule"></div>
+  <div class="slide-headline">Entre el 20 de agosto y el 3 de setiembre, Boticentro saldó 3 pagarés BCP y abrió una nueva línea de crédito con BBVA</div>
+  <div class="slide-subtitle">Cómo se cruzaron los cobros de clientes con los vencimientos de pagarés BCP | 18 de agosto – 03 de setiembre</div>
+  <div class="slide-divider"></div>
+  <div class="slide-body">
+    <div class="panels cols-2">
+      <div class="panel">
+        <h4>Línea de tiempo</h4>
+        <div class="timeline">
+          <div class="tl-step alerta">
+            <div class="tl-date">18/08 — Préstamo puente de David</div>
+            <p>S/ 500 000, ante la incertidumbre de si el Gobierno Regional pagaría a tiempo el 21/08.</p>
+          </div>
+          <div class="tl-step">
+            <div class="tl-date">20/08 — Cobro Gobierno Regional</div>
+            <p>S/ 148 919 recibidos (retención de 3%).</p>
+          </div>
+          <div class="tl-step alerta">
+            <div class="tl-date">21/08 — Apertura línea BBVA</div>
+            <p>Nueva línea de crédito por <strong>S/ 750 000</strong>.</p>
+          </div>
+          <div class="tl-step">
+            <div class="tl-date">21/08 — Pagaré PG_BCP5 pagado</div>
+            <p>S/ 258 901 cubierto con el cobro de Gobierno Regional (148 919) + la diferencia del préstamo de David.</p>
+          </div>
+          <div class="tl-step">
+            <div class="tl-date">31/08 — Trujillo 1 paga S/ 691 525</div>
+            <p>Permite cubrir con holgura el pagaré PG_BCP6 (S/ 151 769).</p>
+          </div>
+          <div class="tl-step">
+            <div class="tl-date">02/09 — Pagaré PG_BCP3 pagado</div>
+            <p>S/ 402 485 cubierto con la línea BBVA.</p>
+          </div>
+          <div class="tl-step alerta">
+            <div class="tl-date">03/09 — Devolución del préstamo de David</div>
+            <p>Se devuelve el préstamo puente (retención ≈ S/ 110 000), cubierto con el cobro de Trujillo 1. David presta S/ 390 000 + interés S/ 60 000 = <strong>S/ 450 000</strong>, a pagar el <strong>28/02/2027</strong>.</p>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h4>Fuentes de caja → pagarés cubiertos</h4>
+        <div class="cross-match">
+          <div class="cm-row">
+            <div class="cm-src">Gob. Regional (148 919) + préstamo David</div>
+            <div class="cm-arrow">→</div>
+            <div class="cm-dst">PG_BCP5 · 21/08 · S/258 901</div>
+          </div>
+          <div class="cm-row">
+            <div class="cm-src">Trujillo 1 (S/691 525)</div>
+            <div class="cm-arrow">→</div>
+            <div class="cm-dst">PG_BCP6 31/08 + devolución préstamo David</div>
+          </div>
+          <div class="cm-row">
+            <div class="cm-src">Línea BBVA (S/750 000)</div>
+            <div class="cm-arrow">→</div>
+            <div class="cm-dst">PG_BCP3 · 02/09 · S/402 485</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout">El cobro de Trujillo 1 sirvió para cubrir el pagaré del 31 de agosto y devolver el préstamo de David. La línea BBVA sirvió para el pagaré del 02 de setiembre.</div>
+  </div>
+  <div class="source-note">Fuente: registros internos de tesorería, Boticentro Perú S.R.L.</div>
+  <div class="slide-num">5 / 10</div>
+</section>
+
+<!-- ===================== SLIDE (III) · SITUACIÓN A LA FECHA (19/09) ===================== -->
+<section class="slide" id="slide-hoy">
+  <div class="slide-topbar">
+    <div class="slide-id">
+      <span class="badge">III</span>
+      <span class="seclabel">Situación a la fecha (19/09)</span>
+    </div>
+    <div class="slide-eyebrow-mini"><b>ANÁLISIS DE SITUACIÓN FINANCIERA ACTUAL</b>BOTICENTRO PERÚ S.R.L.</div>
+  </div>
+  <div class="slide-rule"></div>
+  <div class="slide-headline">Al 19 de setiembre, Boticentro ya había saldado 4 de los 5 pagarés BCP — solo queda pendiente el del 22 de setiembre</div>
+  <div class="slide-subtitle">Cómo se llegó del pagaré del 15 de setiembre al panorama actual | Situación al 19 de setiembre de 2026</div>
+  <div class="slide-divider"></div>
+  <div class="slide-body">
+    <div class="panels cols-2">
+      <div class="panel">
+        <h4>Camino recorrido</h4>
+        <div class="timeline">
+          <div class="tl-step alerta">
+            <div class="tl-date">15/09 — Nuevo pagaré BCP</div>
+            <p>No se contaba con caja suficiente para el pagaré que vencía. Se tomó un nuevo pagaré BCP de S/ 500 000, a pagar el 29/01/2027.</p>
+          </div>
+          <div class="tl-step">
+            <div class="tl-date">Pago del pagaré 15/09</div>
+            <p>Se pagó el pagaré y quedó S/ 100 000 disponible en caja.</p>
+          </div>
+          <div class="tl-step">
+            <div class="tl-date">Cobro de CxC</div>
+            <p>Se cobraron Prosegur y JV Resguardo por S/ 250 000 en total.</p>
+          </div>
+          <div class="tl-step alerta">
+            <div class="tl-date">Próximo paso</div>
+            <p>En miras de pagar el pagaré del 22 de setiembre (S/ 509 000).</p>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h4>Pagarés saldados</h4>
+        <table class="mini">
+          <thead><tr><th>Obligación</th><th>Vencimiento</th><th style="text-align:right">Monto (S/)</th></tr></thead>
+          <tbody>
+            <tr><td>PG_BCP5 <span class="tag tag-ok">✓</span></td><td>21/08</td><td class="num">258 901</td></tr>
+            <tr><td>PG_BCP6 <span class="tag tag-ok">✓</span></td><td>31/08</td><td class="num">151 769</td></tr>
+            <tr><td>PG_BCP3 <span class="tag tag-ok">✓</span></td><td>02/09</td><td class="num">402 485</td></tr>
+            <tr><td>PG_BCP7 <span class="tag tag-ok">✓</span></td><td>15/09</td><td class="num">404 718</td></tr>
+          </tbody>
+          <tfoot><tr><td colspan="2">Subtotal saldado</td><td class="num">1 217 873</td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+    <div class="callout">De los <strong>S/ 1 726 873</strong> en pagarés BCP, ya se saldaron <strong>S/ 1 217 873</strong> — solo resta el pagaré del 22 de setiembre (S/ 509 000).</div>
+  </div>
+  <div class="source-note">Fuente: registros internos de tesorería, Boticentro Perú S.R.L.</div>
+  <div class="slide-num">6 / 10</div>
+</section>
+
+<!-- ===================== SLIDE (IV) · CÓMO ESTAMOS HOY VS ANTES ===================== -->
+<section class="slide" id="slide-comparativo">
+  <div class="slide-topbar">
+    <div class="slide-id">
+      <span class="badge">IV</span>
+      <span class="seclabel">Cómo estamos hoy vs antes</span>
+    </div>
+    <div class="slide-eyebrow-mini"><b>ANÁLISIS DE SITUACIÓN FINANCIERA ACTUAL</b>BOTICENTRO PERÚ S.R.L.</div>
+  </div>
+  <div class="slide-rule"></div>
+  <div class="slide-headline">La deuda total casi no bajó — de S/ 2 994 397 a S/ 2 870 838 (−4,1%): no se solucionó, se pateó</div>
+  <div class="slide-subtitle">Comparativo de saldo de deuda: situación antes (18/08) vs. situación actual (19/09)</div>
+  <div class="slide-divider"></div>
+  <div class="slide-body">
+    <div class="panels cols-2-eq">
+      <div class="panel">
+        <h4>Deuda total: antes vs. ahora (S/)</h4>
+        <div class="panel-chart"><canvas id="chartComparativo"></canvas></div>
+      </div>
+      <div class="panel">
+        <h4>Deuda actual — detalle</h4>
+        <table class="mini">
+          <thead><tr><th>Concepto</th><th style="text-align:right">Monto (S/)</th></tr></thead>
+          <tbody>
+            <tr><td>Préstamo David</td><td class="num">450 000</td></tr>
+            <tr><td>Línea BBVA</td><td class="num">750 000</td></tr>
+            <tr><td>Nuevo pagaré BCP (15/09)</td><td class="num">500 000</td></tr>
+            <tr><td>Otras deudas</td><td class="num">1 170 838</td></tr>
+          </tbody>
+          <tfoot><tr><td>Saldo de deuda actual</td><td class="num">2 870 838</td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+    <div class="callout">Aunque se saldaron 4 pagarés por <strong>S/ 1 217 873</strong>, la deuda total apenas bajó de <strong>S/ 2 994 397</strong> a <strong>S/ 2 870 838</strong> — el nuevo apalancamiento (préstamo de David + línea BBVA + pagaré BCP de enero 2027 = S/ 1 700 000) reemplazó lo pagado. <strong>La deuda no se solucionó, se pateó.</strong></div>
+  </div>
+  <div class="source-note">Fuente: registros internos de tesorería, Boticentro Perú S.R.L.</div>
+  <div class="slide-num">7 / 10</div>
+</section>
+
+<!-- ===================== SLIDE 7 (V) · LIQUIDEZ ACTUAL ===================== -->
+<section class="slide" id="slide-5">
+  <div class="slide-topbar">
+    <div class="slide-id">
+      <span class="badge">V</span>
+      <span class="seclabel">Liquidez Hoy</span>
+    </div>
+    <div class="slide-eyebrow-mini"><b>ANÁLISIS DE SITUACIÓN FINANCIERA ACTUAL</b>BOTICENTRO PERÚ S.R.L.</div>
+  </div>
+  <div class="slide-rule"></div>
+  <div class="slide-headline">La empresa cierra la semana con S/ 462 825 en caja, repartidos entre BCP y BBVA</div>
+  <div class="slide-subtitle">Saldos por cuenta bancaria y origen de los fondos | Al 19 de setiembre de 2026</div>
+  <div class="slide-divider"></div>
+  <div class="slide-body">
+    <div class="panels cols-2-eq">
+      <div class="panel">
+        <h4>Cuenta BCP (soles)</h4>
+        <div class="acc-total">S/ 407 825</div>
+        <div class="tag tag-warn" style="margin-bottom:8px">Se usará para el pagaré del 22/09, si Trujillo 2 no paga a tiempo</div>
+        <div class="acc-row"><span class="lbl">Caja previa</span><span class="val">151 000</span></div>
+        <div class="acc-row"><span class="lbl">Retiro de BBVA</span><span class="val">150 000</span></div>
+        <div class="acc-row"><span class="lbl">Remanente pago pagaré 15/09 (500 000 − 400 000)</span><span class="val">100 000</span></div>
+      </div>
+      <div class="panel">
+        <h4>Cuenta BBVA (soles)</h4>
+        <div class="acc-total">S/ 55 000</div>
+        <div class="tag tag-warn" style="margin-bottom:8px">Se usa para el pago automático de la cuota mensual (S/ 55 000/mes)</div>
+        <div class="acc-row"><span class="lbl">Quedaba en caja</span><span class="val">210 000</span></div>
+        <div class="acc-row"><span class="lbl">Depositado a cuenta BCP</span><span class="val">− 150 000</span></div>
+        <div class="acc-row"><span class="lbl">Reservado para pagar línea BBVA</span><span class="val">60 000</span></div>
+      </div>
+    </div>
+    <div class="callout">La cuenta BCP se destinará al pago del pagaré del 22 de setiembre, en caso Trujillo 2 no pague a tiempo. El saldo de la cuenta BBVA (S/ 55 000) se usa para el pago automático de la cuota mensual de la línea de crédito.</div>
+  </div>
+  <div class="source-note">Fuente: registros internos de tesorería, Boticentro Perú S.R.L.</div>
+  <div class="slide-num">8 / 10</div>
+</section>
+
+<!-- ===================== SLIDE 8 (VI) · OPORTUNIDADES ===================== -->
+<section class="slide" id="slide-6">
+  <div class="slide-topbar">
+    <div class="slide-id">
+      <span class="badge">VI</span>
+      <span class="seclabel">Oportunidades</span>
+    </div>
+    <div class="slide-eyebrow-mini"><b>ANÁLISIS DE SITUACIÓN FINANCIERA ACTUAL</b>BOTICENTRO PERÚ S.R.L.</div>
+  </div>
+  <div class="slide-rule"></div>
+  <div class="slide-headline">Cuatro frentes abiertos podrían sumar volumen y nuevos mercados en los próximos meses</div>
+  <div class="slide-subtitle">Pedidos en curso y proyectos en evaluación | Setiembre 2026</div>
+  <div class="slide-divider"></div>
+  <div class="slide-body">
+    <div class="panels cols-2-eq">
+      <div class="panel">
+        <h4>Bota económica Liderman</h4>
+        <div class="kgrid g3" style="flex:0">
+          <div><div class="klabel">Pedido mensual</div><div class="kval small">1 000 botas</div></div>
+          <div><div class="klabel">Precio venta</div><div class="kval small">S/ 59,00</div></div>
+          <div><div class="klabel">Utilidad unit.</div><div class="kval small">S/ 11,50</div></div>
+        </div>
+        <div class="callout" style="margin-top:10px">Utilidad mensual estimada ≈ <strong>S/ 11 500</strong> (calculado: 1 000 × S/ 11,50).</div>
+      </div>
+      <div class="panel">
+        <h4>Pedidos Liderman (detalle)</h4>
+        <div class="panel-chart"><canvas id="chartLiderman"></canvas></div>
+      </div>
+      <div class="panel">
+        <h4>Buena Pro Gobierno Regional</h4>
+        <div class="kgrid g2" style="flex:0">
+          <div><div class="klabel">Monto</div><div class="kval small">S/ 142 700</div></div>
+          <div><div class="klabel">Utilidad (PV − costo)</div><div class="kval small">S/ 70 000</div></div>
+        </div>
+        <div class="callout" style="margin-top:10px">Margen de la operación ≈ <strong>49%</strong> (calculado: 70 000 / 142 700).</div>
+      </div>
+      <div class="panel">
+        <h4>Encender nueva línea</h4>
+        <div class="kcard" style="border:none;padding:0">
+          <div class="klabel">Objetivo</div>
+          <div class="ksub" style="font-size:13px;color:var(--gris-900)">Abrir mercado nuevo</div>
+        </div>
+        <div class="kcard" style="border:none;padding:0;margin-top:8px">
+          <div class="klabel">Inversión estimada</div>
+          <div class="kval">USD 13 000 <span class="tag tag-pend">EN EVALUACIÓN</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="source-note">Fuente: registros internos comerciales, Boticentro Perú S.R.L.</div>
+  <div class="slide-num">9 / 10</div>
+</section>
+
+<!-- ===================== SLIDE 9 (VII) · EN REVISIÓN ===================== -->
+<section class="slide" id="slide-7">
+  <div class="slide-topbar">
+    <div class="slide-id">
+      <span class="badge">VII</span>
+      <span class="seclabel">Puntos en revisión</span>
+    </div>
+    <div class="slide-eyebrow-mini"><b>ANÁLISIS DE SITUACIÓN FINANCIERA ACTUAL</b>BOTICENTRO PERÚ S.R.L.</div>
+  </div>
+  <div class="slide-rule"></div>
+  <div class="slide-headline">Más allá de la caja, hay tres frentes estructurales que siguen abiertos</div>
+  <div class="slide-subtitle">Diagnóstico cualitativo — sin cifras aún, para profundizar en próximas sesiones</div>
+  <div class="slide-divider"></div>
+  <div class="slide-body">
+    <div class="review-grid">
+      <div class="review-card exo">
+        <h5>Variables exógenas</h5>
+        <ul>
+          <li>Seguridad</li>
+          <li>Adquirir nube para guardar información</li>
+          <li>Sunafil</li>
+          <li>Sunat</li>
+        </ul>
+      </div>
+      <div class="review-card org">
+        <h5>Organización</h5>
+        <ul>
+          <li>Plan estratégico: definir visión</li>
+          <li>Objetivos</li>
+          <li>Responsables</li>
+          <li>Trabajo en equipo</li>
+        </ul>
+      </div>
+      <div class="review-card endo">
+        <h5>Variables endógenas</h5>
+        <ul>
+          <li>Almacén sin control</li>
+          <li>Compras sin sustento</li>
+          <li>Imagen institucional escasa (web, redes sociales)</li>
+          <li>Productividad en producción</li>
+          <li>Baños y comedor de personal</li>
+          <li>Cuidado interno - accidentes laborales</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="slide-num">10 / 10</div>
+</section>
+
+</div>
+
+<script>
+  const verde900='#1B5E20', verde800='#2E7D32', verde400='#66BB6A', verde200='#A5D6A7',
+        gris600='#757575', amarillo='#F9C412';
+
+  Chart.defaults.font.family = "'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+  Chart.defaults.color = gris600;
+
+  const fmtS = v => 'S/ ' + Math.round(v).toLocaleString('es-PE');
+
+  /* etiquetas de valor sobre barras/segmentos (con formateador configurable) */
+  const valueLabelPlugin = {
+    id:'valueLabel',
+    afterDatasetsDraw(chart){
+      const {ctx}=chart;
+      const horizontal = chart.options.indexAxis==='y';
+      const mode = (chart.options.plugins && chart.options.plugins.valueLabelMode) || 'stackedLastOutside';
+      const lastIndex = chart.data.datasets.length-1;
+      chart.data.datasets.forEach((dataset,dsIndex)=>{
+        const meta=chart.getDatasetMeta(dsIndex);
+        if(meta.hidden || dataset.noLabel) return;
+        meta.data.forEach((element,index)=>{
+          const value=dataset.data[index];
+          if(!value) return;
+          const pos=element.tooltipPosition();
+          const text = fmtS(dataset.totalOverride ? dataset.totalOverride[index] : value);
+          const outside = mode==='allOutside' || dsIndex===lastIndex;
+          ctx.save();
+          ctx.font="700 10.5px 'Segoe UI',sans-serif";
+          if(outside){
+            ctx.fillStyle=dataset.labelColor||'#333333';
+            if(horizontal){ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(text,pos.x+8,pos.y);}
+            else{ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText(text,pos.x,pos.y-8);}
+          } else {
+            const props=element.getProps(['width','height'],true);
+            const size = horizontal? props.width : props.height;
+            if(ctx.measureText(text).width+10<=size){
+              ctx.fillStyle='#ffffff';
+              ctx.textAlign='center';ctx.textBaseline='middle';
+              ctx.fillText(text,pos.x,pos.y);
+            }
+          }
+          ctx.restore();
+        });
+      });
+    }
+  };
+
+  /* etiqueta única (total apilado) en negro, pegada al extremo derecho real de la barra */
+  const cxcLabelPlugin = {
+    id:'cxcLabel',
+    afterDatasetsDraw(chart){
+      const {ctx}=chart;
+      const lastIdx=chart.data.datasets.length-1;
+      const meta=chart.getDatasetMeta(lastIdx);
+      meta.data.forEach((element,index)=>{
+        const total=chart.data.datasets.reduce((s,d)=>s+(d.data[index]||0),0);
+        if(!total) return;
+        const pos=element.tooltipPosition();
+        ctx.save();
+        ctx.font="700 10.5px 'Segoe UI',sans-serif";
+        ctx.fillStyle='#1a1a1a';
+        ctx.textAlign='left';ctx.textBaseline='middle';
+        ctx.fillText(fmtS(total),pos.x+8,pos.y);
+        ctx.restore();
+      });
+    }
+  };
+
+  /* etiqueta simple "N pares" sobre barras horizontales de un solo dataset */
+  const paresLabelPlugin = {
+    id:'paresLabel',
+    afterDatasetsDraw(chart){
+      const {ctx}=chart;
+      const meta=chart.getDatasetMeta(0);
+      meta.data.forEach((element,index)=>{
+        const value=chart.data.datasets[0].data[index];
+        if(!value) return;
+        const pos=element.tooltipPosition();
+        const text=value+' pares';
+        ctx.save();
+        ctx.font="700 10.5px 'Segoe UI',sans-serif";
+        ctx.fillStyle='#1B5E20';
+        ctx.textAlign='left';ctx.textBaseline='middle';
+        ctx.fillText(text,pos.x+8,pos.y);
+        ctx.restore();
+      });
+    }
+  };
+
+  /* ---- Slide 3: Pagarés BCP por vencimiento (capital + interés apilado) ---- */
+  new Chart(document.getElementById('chartPagares'),{
+    type:'bar',
+    data:{
+      labels:['21/08 · PG_BCP5','31/08 · PG_BCP6','02/09 · PG_BCP3','15/09 · PG_BCP7','22/09 · PG_BCP4'],
+      datasets:[
+        {label:'Capital',data:[250000,150000,400000,400000,500000],backgroundColor:verde800,borderRadius:3,maxBarThickness:52,stack:'p',noLabel:true},
+        {label:'Interés',data:[8901,1769,2485,4718,9000],backgroundColor:amarillo,labelColor:'#8a6d00',borderRadius:3,maxBarThickness:52,stack:'p',totalOverride:[258901,151769,402485,404718,509000]}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      layout:{padding:{top:6}},
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10.5}}},
+        tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmtS(c.parsed.y)}}},
+      scales:{
+        x:{stacked:true,grid:{display:false},ticks:{font:{size:10}}},
+        y:{stacked:true,beginAtZero:true,grid:{color:'#EEEEEE'},ticks:{font:{size:10},callback:v=>'S/'+(v/1e3)+'k'}}
+      }
+    },
+    plugins:[valueLabelPlugin]
+  });
+
+  /* ---- Slide 4: Cuentas por cobrar (situación antes, todo pendiente) ---- */
+  new Chart(document.getElementById('chartCxC'),{
+    type:'bar',
+    data:{
+      labels:['Gobierno Regional','Trujillo 1','JV Resguardo'],
+      datasets:[
+        {label:'Pendiente',data:[153525,691525,53235],backgroundColor:amarillo,borderRadius:4,maxBarThickness:34,stack:'c'}
+      ]
+    },
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      layout:{padding:{right:70}},
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmtS(c.parsed.x)}}},
+      scales:{
+        x:{stacked:true,beginAtZero:true,grid:{color:'#EEEEEE'},ticks:{font:{size:10},callback:v=>'S/'+(v/1e3)+'k'}},
+        y:{stacked:true,grid:{display:false},ticks:{font:{size:11}}}
+      }
+    },
+    plugins:[cxcLabelPlugin]
+  });
+
+  /* ---- Slide IV: Comparativo de deuda total (antes vs. ahora) ---- */
+  new Chart(document.getElementById('chartComparativo'),{
+    type:'bar',
+    data:{
+      labels:['Antes (18/08)','Ahora (19/09)'],
+      datasets:[{data:[2994397,2870838],backgroundColor:[verde800,amarillo],labelColor:'#1a1a1a',borderRadius:4,maxBarThickness:60}]
+    },
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      layout:{padding:{right:90}},
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{label:c=>fmtS(c.parsed.x)}}},
+      scales:{
+        x:{beginAtZero:true,grid:{color:'#EEEEEE'},ticks:{font:{size:10},callback:v=>'S/'+(v/1e6).toFixed(1)+'M'}},
+        y:{grid:{display:false},ticks:{font:{size:12,weight:'600'}}}
+      }
+    },
+    plugins:[valueLabelPlugin]
+  });
+
+  /* ---- Slide 8: Pedidos Liderman (pares por producto) ---- */
+  new Chart(document.getElementById('chartLiderman'),{
+    type:'bar',
+    data:{
+      labels:['Botín Novacsh','Bota marrón','Corfan'],
+      datasets:[{data:[83,256,190],backgroundColor:verde400,labelColor:verde900,borderRadius:4,maxBarThickness:30}]
+    },
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      layout:{padding:{right:70}},
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{label:c=>c.parsed.x+' pares'}}},
+      scales:{
+        x:{beginAtZero:true,grid:{color:'#EEEEEE'},ticks:{font:{size:10}}},
+        y:{grid:{display:false},ticks:{font:{size:11}}}
+      }
+    },
+    plugins:[paresLabelPlugin]
+  });
+</script>
+</body>
+</html>
